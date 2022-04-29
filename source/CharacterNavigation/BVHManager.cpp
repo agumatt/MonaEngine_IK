@@ -16,6 +16,7 @@ namespace Mona{
         std::string pyLine = std::string("sys.path.append(") + src_path + std::string(")");
         PyRun_SimpleString("import sys");
         PyRun_SimpleString(pyLine.data());
+
         if (PyImport_ImportModule("cython_interface") == NULL) {
             fprintf(stderr, "Unable to import cython module.\n");
             if (PyErr_Occurred()) {
@@ -37,7 +38,7 @@ namespace Mona{
         }
         BVH_file_interface* pyFilePtr = createFileInterface(PyUnicode_FromString(filePath.data()), listObj);
         initFile(pyFilePtr);
-        Py_Finalize();
+        Py_FinalizeEx();
     }
 
     BVH_file::BVH_file(std::string filePath) {
@@ -62,9 +63,15 @@ namespace Mona{
                 fprintf(stderr, "Unknown error");
             }
         }
+
+
         BVH_file_interface* pyFilePtr = createFileInterface(PyUnicode_FromString(filePath.data()), PyBool_FromLong(0));
+
+        BVH_writer_interface* pyWriterPtr = createWriterInterface(PyUnicode_FromString(filePath.data()));
+        int jointNum = pyWriterPtr->jointNum;
         initFile(pyFilePtr);
-        Py_Finalize();
+
+        Py_FinalizeEx();
     }
 
     void BVH_file::initFile(BVH_file_interface* pyFile) {
@@ -107,7 +114,7 @@ namespace Mona{
             for (Py_ssize_t i = 0; i < PyList_Size(pyFile->offsets); i++) {
                 PyObject* jointOff = PyList_GetItem(pyFile->offsets, i);
                 m_offsets[i] = new float[3];
-                for (Py_ssize_t j = 0; j < PyList_Size(jointOff); j++) {
+                for (Py_ssize_t j = 0; j < 3; j++) {
                     PyObject* valOff = PyList_GetItem(jointOff, j);
                     m_offsets[i][j] = (float)PyFloat_AsDouble(valOff);
                 }
@@ -119,7 +126,7 @@ namespace Mona{
         }
 
         // rotations
-        m_rotations = new float**[frameNum];//new float[frameNum][jointNum][3];
+        m_rotations = new float**[frameNum];
         if (PyList_Check(pyFile->rotations)) {
             for (Py_ssize_t i = 0; i < PyList_Size(pyFile->rotations); i++) {
                 PyObject* frameRot = PyList_GetItem(pyFile->rotations, i);
@@ -140,18 +147,14 @@ namespace Mona{
 
 
         // positions
-        m_positions = new float**[frameNum];//new float[frameNum][jointNum][3];
-        if (PyList_Check(pyFile->positions)) {
-            for (Py_ssize_t i = 0; i < PyList_Size(pyFile->positions); i++) {
-                PyObject* framePos = PyList_GetItem(pyFile->positions, i);
-                m_positions[i] = new float*[jointNum];
-                for (Py_ssize_t j = 0; j < PyList_Size(framePos); j++) {
-                    PyObject* jointPos = PyList_GetItem(framePos, j);
-                    m_positions[i][j] = new float[3];
-                    for (Py_ssize_t k = 0; k < PyList_Size(jointPos); k++) {
-                        PyObject* valPos = PyList_GetItem(jointPos, k);
-                        m_positions[i][j][k] = (float)PyFloat_AsDouble(valPos);
-                    }
+        m_rootPositions = new float*[frameNum];
+        if (PyList_Check(pyFile->rootPositions)) {
+            for (Py_ssize_t i = 0; i < PyList_Size(pyFile->rootPositions); i++) {
+                PyObject* jointRoot = PyList_GetItem(pyFile->rootPositions, i);
+                m_rootPositions[i] = new float[3];
+                for (Py_ssize_t j = 0; j < 3; j++) {
+                    PyObject* valRoot = PyList_GetItem(jointRoot, j);
+                    m_rootPositions[i][j] = (float)PyFloat_AsDouble(valRoot);
                 }
             }
         }
@@ -165,10 +168,30 @@ namespace Mona{
     }
 
     void BVH_writer::write(float*** rotations, float** positions, float frametime, int frameNum, std::string writePath){
+        if (PyImport_AppendInittab("cython_interface", PyInit_cython_interface) != 0) {
+            fprintf(stderr, "Unable to extend Python inittab");
+        }
         Py_Initialize();   // initialize Python
-        PyInit_cython_interface();
-        BVH_writer_interface* pyWriterPtr = createWriterInterface(PyUnicode_FromString(writePath.data()));
-        // BVH_writer_interface structWriter = (BVH_writer_interface)pyWriter;
+        std::string file_path = __FILE__;
+        std::string dir_path = file_path.substr(0, file_path.rfind("\\"));
+        std::replace(dir_path.begin(), dir_path.end(), '\\', '/');
+        std::string src_path = "'" + dir_path + std::string("/bvh_python/pySrc") + "'";
+        std::string pyLine = std::string("sys.path.append(") + src_path + std::string(")");
+        PyRun_SimpleString("import sys");
+        PyRun_SimpleString(pyLine.data());
+
+        if (PyImport_ImportModule("cython_interface") == NULL) {
+            fprintf(stderr, "Unable to import cython module.\n");
+            if (PyErr_Occurred()) {
+                PyErr_PrintEx(0);
+            }
+            else {
+                fprintf(stderr, "Unknown error");
+            }
+        }
+
+
+        BVH_writer_interface* pyWriterPtr = createWriterInterface(PyUnicode_FromString(m_staticDataPath.data()));
         int jointNum = pyWriterPtr->jointNum;
         // rotations
         PyObject* frameListRot = PyList_New( frameNum );
@@ -202,7 +225,7 @@ namespace Mona{
         }
 
         writeBVH_interface(pyWriterPtr, frameListRot, frameListPos, PyUnicode_FromString(writePath.data()), PyFloat_FromDouble((double)frametime));
-        Py_Finalize();
+        Py_FinalizeEx();
     }
 
 }

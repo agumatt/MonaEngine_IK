@@ -19,19 +19,19 @@ struct BVH_file_interface {
   PyObject *topology;
   PyObject *jointNames;
   PyObject *offsets;
-  PyObject *positions;
+  PyObject *rootPositions;
   PyObject *rotations;
   int jointNum;
   int frameNum;
   float frametime;
 };
 
-/* "cython_interface.pyx":44
- * #BVH_writer
+/* "cython_interface.pyx":43
  * 
+ * #BVH_writer
  * cdef public class BVH_writer_interface[object BVH_writer_interface, type BVH_writer_interface_type]:             # <<<<<<<<<<<<<<
  *     cdef public int jointNum
- *     cdef public staticDataPath
+ *     cdef public object staticDataPath
  */
 struct BVH_writer_interface {
   PyObject_HEAD

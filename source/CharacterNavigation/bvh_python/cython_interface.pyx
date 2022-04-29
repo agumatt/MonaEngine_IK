@@ -8,7 +8,7 @@ cdef public class BVH_file_interface[object BVH_file_interface, type BVH_file_in
     cdef public object topology
     cdef public object jointNames
     cdef public object offsets
-    cdef public object positions
+    cdef public object rootPositions
     cdef public object rotations
     cdef public int jointNum
     cdef public int frameNum
@@ -31,7 +31,7 @@ cdef public BVH_file_interface createFileInterface(filePath, jointNames):
     fileInterface.offsets = pyFile.offsets.tolist()
 
     #positions (FrameNum x JointNum x 3)
-    fileInterface.positions = pyFile.get_positions().tolist()
+    fileInterface.rootPositions = pyFile.get_root_positions().tolist()
 
     #rotations (FrameNum x JointNum x 3)
     fileInterface.rotations = pyFile.anim.rotations[:, pyFile.joints, :].tolist()
@@ -40,16 +40,25 @@ cdef public BVH_file_interface createFileInterface(filePath, jointNames):
 
 
 #BVH_writer
-
 cdef public class BVH_writer_interface[object BVH_writer_interface, type BVH_writer_interface_type]:
     cdef public int jointNum
-    cdef public staticDataPath
+    cdef public object staticDataPath
 
 cdef public BVH_writer_interface createWriterInterface(staticDataPath):
+        print("called1")
         writerInterface = BVH_writer_interface()
-        pyFile = BVH_writer(staticDataPath)
-        writerInterface.jointNum = pyFile.joint_num
+        print("called2")
+        pyWriter = BVH_writer(staticDataPath)
+        print("called3")
+        writerInterface.jointNum = pyWriter.joint_num
+        print("called4")
         writerInterface.staticDataPath = staticDataPath
+        print("called5")
+        print("1: " + staticDataPath)
+        print("1: " + pyWriter.joint_num)
+        print("2: " + writerInterface.staticDataPath)
+        print("2: " + writerInterface.jointNum)
+        print("called6")
         return writerInterface
 
 #rotations -> F x J x 3, positions -> F x 3
