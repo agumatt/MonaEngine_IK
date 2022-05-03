@@ -6,62 +6,128 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+# Find boost
 
-project(ViennaCL)
+#SET(MTL_INCLUDE_DIRS "${MTL_DIR}/../../include")
+find_package(Boost 1.36 REQUIRED)
+if(Boost_FOUND)
+  LIST(APPEND MTL_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+endif(Boost_FOUND)
 
-set(VERSION_MAJOR 1)
-set(VERSION_MINOR 7)
-set(VERSION_PATCH 1)
-set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+# # find MTL
+# find_path(MTL_INCLUDE_DIR boost/numeric/itl)
+# if(NOT MTL_INCLUDE_DIR)
+#   message(SEND_ERROR "Failed to find MTL")
+# endif()
+# mark_as_advanced(MTL_INCLUDE_DIR)
 
-SET(CMAKE_VERBOSE_MAKEFILE ON)   #uncomment this line to increase CMake verbosity
-
-#SET(BOOSTPATH "C:/Program\ Files\ (x86)/boost/boost_1_42")    #Boost path for other systems - customize as needed
-
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-
-
-# Common options
-################
-
-set(VIENNACL_SRC_DIST TRUE)
-include(ViennaCLCommon)
-
-# Set release build:
-IF(DEFINED CMAKE_BUILD_TYPE)
- SET (CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
-ELSE()
- SET (CMAKE_BUILD_TYPE Release)
-ENDIF()
+# include_directories(${MTL_INCLUDE_DIRS} "${MTL_INCLUDE_DIR}")
 
 
-# Compile options
-#################
+# Find OpenCL
 
-include_directories(BEFORE "${PROJECT_SOURCE_DIR}")
+# - Find the OpenCL headers and library
+#
+# Defines the following if found:
+#  OPENCL_FOUND        : TRUE if found, FALSE otherwise
+#  OPENCL_INCLUDE_DIRS : Include directories for OpenCL
+#  OPENCL_LIBRARIES    : The libraries to link against
+#
+# The user can set the OPENCLROOT environment variable to help finding OpenCL
+# if it is installed in a non-standard place.
 
+find_path(OPENCL_INCLUDE_DIR
+  NAMES
+    CL/cl.h OpenCL/cl.h
+  PATHS
+    ENV "PROGRAMFILES(X86)"
+    ENV AMDAPPSDKROOT
+    ENV INTELOCLSDKROOT
+    ENV NVSDKCOMPUTE_ROOT
+    ENV CUDA_PATH
+    ENV ATISTREAMSDKROOT
+    ENV OCL_ROOT
+    "${PROJECT_SOURCE_DIR}"
+  PATH_SUFFIXES
+    include
+    OpenCL/common/inc
+    "AMD APP/include")
 
-# Subdirectories
-################
-
-if(BUILD_EXAMPLES)
-   add_subdirectory(examples)
+if(WIN32)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    find_library(OPENCL_LIBRARY
+      NAMES OpenCL
+      PATHS
+        ENV "PROGRAMFILES(X86)"
+        ENV AMDAPPSDKROOT
+        ENV INTELOCLSDKROOT
+        ENV CUDA_PATH
+        ENV NVSDKCOMPUTE_ROOT
+        ENV ATISTREAMSDKROOT
+        ENV OCL_ROOT
+      PATH_SUFFIXES
+        "AMD APP/lib/x86"
+        lib/x86
+        lib/Win32
+        OpenCL/common/lib/Win32)
+  elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    find_library(OPENCL_LIBRARY
+      NAMES OpenCL
+      PATHS
+        ENV "PROGRAMFILES(X86)"
+        ENV AMDAPPSDKROOT
+        ENV INTELOCLSDKROOT
+        ENV CUDA_PATH
+        ENV NVSDKCOMPUTE_ROOT
+        ENV ATISTREAMSDKROOT
+        ENV OCL_ROOT
+      PATH_SUFFIXES
+        "AMD APP/lib/x86_64"
+        lib/x86_64
+        lib/x64
+        OpenCL/common/lib/x64)
+  endif()
+else()
+  if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    find_library(OPENCL_LIBRARY
+      NAMES OpenCL
+      PATHS
+        ENV AMDAPPSDKROOT
+        ENV CUDA_PATH
+      PATH_SUFFIXES
+        lib/x86
+        lib)
+  elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    find_library(OPENCL_LIBRARY
+      NAMES OpenCL
+      PATHS
+        ENV AMDAPPSDKROOT
+        ENV CUDA_PATH
+      PATH_SUFFIXES
+        lib/x86_64
+        lib/x64
+        lib
+        lib64)
+  endif()
 endif()
 
-if(BUILD_TESTING)
-   INCLUDE(CTest)
-   add_subdirectory(tests)
-endif()
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(
+  OPENCL
+  DEFAULT_MSG
+  OPENCL_LIBRARY OPENCL_INCLUDE_DIR
+  )
 
-add_subdirectory(doc)
+if(OPENCL_FOUND)
+  set(OPENCL_INCLUDE_DIRS "${OPENCL_INCLUDE_DIR}")
+  set(OPENCL_LIBRARIES "${OPENCL_LIBRARY}")
+else(OPENCL_FOUND)
+  set(OPENCL_INCLUDE_DIRS)
+  set(OPENCL_LIBRARIES)
+endif(OPENCL_FOUND)
 
-add_subdirectory(libviennacl)
-
-# Install
-#########
-
-install(DIRECTORY viennacl "${CMAKE_CURRENT_BINARY_DIR}/viennacl"
-   DESTINATION "${INSTALL_INCLUDE_DIR}" COMPONENT dev
-   FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-
+mark_as_advanced(
+  OPENCL_INCLUDE_DIR
+  OPENCL_LIBRARY
+  )
 
