@@ -15,7 +15,8 @@ set(THIRD_PARTY_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/glad
 						"${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/assimp-5.0.1/include"
 						"${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/stb"
 						${Python_INCLUDE_DIRS}
-						"${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/viennacl")
+						"${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/viennacl"
+						"${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/viennacl/libviennacl/include")
 
 set(MONA_INCLUDE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/source")
 if(NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})

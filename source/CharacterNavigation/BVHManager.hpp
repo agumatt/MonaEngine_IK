@@ -6,15 +6,8 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "viennacl/scalar.hpp"
 #include "viennacl/matrix.hpp"
 #include "viennacl/vector.hpp"
-#include "viennacl/linalg/prod.hpp"
-#include "viennacl/linalg/norm_2.hpp"
-#include "viennacl/linalg/direct_solve.hpp"
-#include "viennacl/linalg/lu.hpp"
-#include "viennacl/linalg/sum.hpp"
-#include "viennacl/tools/random.hpp"
 
 namespace Mona {
     typedef viennacl::matrix<float> MatrixXf;
