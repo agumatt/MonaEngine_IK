@@ -1,15 +1,24 @@
 #pragma once
 #ifndef BVHMANAGER_HPP
 #define BVHMANAGER_HPP
+#define VIENNACL_WITH_OPENCL
 #include "bvh_python/cython_interface.h"
 #include <string>
 #include <vector>
 #include <memory>
-#include <Eigen/Dense>
+#include "viennacl/scalar.hpp"
+#include "viennacl/matrix.hpp"
+#include "viennacl/vector.hpp"
+#include "viennacl/linalg/prod.hpp"
+#include "viennacl/linalg/norm_2.hpp"
+#include "viennacl/linalg/direct_solve.hpp"
+#include "viennacl/linalg/lu.hpp"
+#include "viennacl/linalg/sum.hpp"
+#include "viennacl/tools/random.hpp"
 
 namespace Mona {
-    typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> MatrixXf;
-    typedef Eigen::Matrix<float, 1, Eigen::Dynamic> VectorXf;
+    typedef viennacl::matrix<float> MatrixXf;
+    typedef viennacl::vector<float> VectorXf;
 
     struct BVHDynamicData {
         std::vector<VectorXf> rootPositions;

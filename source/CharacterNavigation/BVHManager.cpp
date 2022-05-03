@@ -199,7 +199,7 @@ namespace Mona{
             throw new std::exception("Dynamic data must fit static data!");
         }
         for (int i = 0; i < m_frameNum; i++) {
-            if (rotations[i].rows() != m_jointNum || rotations[i].cols() != 4) {
+            if (rotations[i].size1() != m_jointNum || rotations[i].size2() != 4) {
                 throw new std::exception("Dynamic data must fit static data!");
             }
             if (rootPositions[i].size() != 3) {
