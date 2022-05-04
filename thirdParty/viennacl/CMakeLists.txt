@@ -78,7 +78,6 @@ add_subdirectory(libviennacl)
 
 include_directories(${PROJECT_SOURCE_DIR}/libviennacl/include/)
 include_directories(${PROJECT_SOURCE_DIR}/libviennacl/)
-include_directories(${PROJECT_SOURCE_DIR})
 
 if(ENABLE_OPENCL)
     add_library(viennacl SHARED libviennacl/src/backend.cpp
