@@ -99,7 +99,6 @@ if(ENABLE_OPENMP AND MINGW)
    target_link_libraries(viennacl gomp)
 endif(ENABLE_OPENMP AND MINGW)
 
-
 # Dist target
 #############
 
