@@ -136,7 +136,13 @@ int main()
   *  That's it, print a completion message. Read on for details on how to implement the actual compute kernels.
   **/
   std::cout << "!!!! TUTORIAL COMPLETED SUCCESSFULLY !!!!" << std::endl;
-
+  while (true){
+    
+  }
+  {
+    /* code */
+  }
+  
   return EXIT_SUCCESS;
 }
 
