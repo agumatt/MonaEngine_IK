@@ -1,3 +1,5 @@
-file(GLOB_RECURSE viennaFiles "*.hpp" "*.cpp")
-add_library(viennacl STATIC ${viennaFiles})
-target_include_directories(viennacl PRIVATE ${THIRD_PARTY_INCLUDE_DIRECTORIES})
+file(GLOB_RECURSE viennaFiles *.hpp *.h)
+add_library(viennacl STATIC ${viennaFiles} viennacl/lang.cpp)
+#add_library(viennacl STATIC viennacl/matrix.hpp viennacl/vector.hpp viennacl/lang.cpp)
+set_target_properties(viennacl PROPERTIES PUBLIC_HEADER "${viennaFiles}")
+target_include_directories(viennacl PUBLIC ${THIRD_PARTY_INCLUDE_DIRECTORIES})

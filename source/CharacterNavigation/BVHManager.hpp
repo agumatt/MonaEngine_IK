@@ -6,10 +6,9 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "viennacl/matrix.hpp"
-#include "viennacl/vector.hpp"
-#include "viennacl/linalg/norm_2.hpp"
-
+#include <viennacl/linalg/norm_2.hpp>
+#include <viennacl/matrix.hpp>
+#include <viennacl/vector.hpp>
 namespace Mona {
     typedef viennacl::matrix<float> MatrixXf;
     typedef viennacl::vector<float> VectorXf;
