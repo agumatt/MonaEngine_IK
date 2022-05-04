@@ -1,20 +1,7 @@
-set(EXAMPLES_TESTDATA
-   testdata/mat65k.mtx
-   testdata/README
-   testdata/result65025.txt
-   testdata/rhs65025.txt
-   testdata/eigen/nsm1.example
-   testdata/eigen/nsm2.example
-   testdata/eigen/nsm3.example
-   testdata/eigen/symm5.example
-   testdata/svd/qr.example
-   testdata/svd/wiki.example
-   testdata/svd/wiki.qr.example
-   testdata/svd/pysvd.example
-   testdata/svd/random.example)
-foreach(f ${EXAMPLES_TESTDATA})
-   configure_file(${f} "${CMAKE_CURRENT_BINARY_DIR}/${f}" COPYONLY)
+foreach(tut viennaTEST)
+   add_executable(${tut} ${tut}.cpp)
+   if (ENABLE_OPENCL)
+     target_link_libraries(${tut} ${OPENCL_LIBRARIES})
+     set_target_properties(${tut} PROPERTIES COMPILE_FLAGS "-DVIENNACL_WITH_OPENCL")
+   endif (ENABLE_OPENCL)
 endforeach()
-
-add_subdirectory(tutorial)
-add_subdirectory(benchmarks)

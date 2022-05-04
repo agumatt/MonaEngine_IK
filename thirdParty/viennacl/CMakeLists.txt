@@ -68,11 +68,6 @@ if(BUILD_EXAMPLES)
    add_subdirectory(examples)
 endif()
 
-if(BUILD_TESTING)
-   INCLUDE(CTest)
-   add_subdirectory(tests)
-endif()
-
 add_subdirectory(doc)
 
 add_subdirectory(libviennacl)
@@ -80,9 +75,30 @@ add_subdirectory(libviennacl)
 # Install
 #########
 
-install(DIRECTORY viennacl "${CMAKE_CURRENT_BINARY_DIR}/viennacl"
-   DESTINATION "${INSTALL_INCLUDE_DIR}" COMPONENT dev
-   FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+
+include_directories(${PROJECT_SOURCE_DIR}/libviennacl/include/)
+include_directories(${PROJECT_SOURCE_DIR}/libviennacl/)
+include_directories(${PROJECT_SOURCE_DIR})
+
+if(ENABLE_OPENCL)
+    add_library(viennacl SHARED libviennacl/src/backend.cpp
+                                libviennacl/src/blas1.cpp libviennacl/src/blas1_host.cpp libviennacl/src/blas1_opencl.cpp
+                                libviennacl/src/blas2.cpp libviennacl/src/blas2_host.cpp libviennacl/src/blas2_opencl.cpp
+                                libviennacl/src/blas3.cpp libviennacl/src/blas3_host.cpp libviennacl/src/blas3_opencl.cpp)
+    set_target_properties(viennacl PROPERTIES COMPILE_FLAGS "-DVIENNACL_WITH_OPENCL")
+    target_link_libraries(viennacl ${OPENCL_LIBRARIES})
+else(ENABLE_OPENCL)
+   add_library(viennacl SHARED libviennacl/src/backend.cpp
+                              libviennacl/src/blas1.cpp libviennacl/src/blas1_host.cpp
+                              libviennacl/src/blas2.cpp libviennacl/src/blas2_host.cpp
+                              libviennacl/src/blas3.cpp libviennacl/src/blas3_host.cpp)
+endif(ENABLE_OPENCL)
+
+# Special linkage for OpenMP under MinGW:
+if(ENABLE_OPENMP AND MINGW)
+   target_link_libraries(viennacl gomp)
+endif(ENABLE_OPENMP AND MINGW)
+
 
 # Dist target
 #############

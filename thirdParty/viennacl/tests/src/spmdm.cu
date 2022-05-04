@@ -1,1 +1,0 @@
-spmdm.cpp
