@@ -1,13 +1,14 @@
 #pragma once
 #ifndef BVHMANAGER_HPP
 #define BVHMANAGER_HPP
-#define VIENNACL_WITH_OPENCL
+#define VIENNACL_WITH_OPENCL 1
 #include "bvh_python/cython_interface.h"
 #include <string>
 #include <vector>
 #include <memory>
 #include "viennacl/matrix.hpp"
 #include "viennacl/vector.hpp"
+#include "viennacl/linalg/norm_2.hpp"
 
 namespace Mona {
     typedef viennacl::matrix<float> MatrixXf;

@@ -43,7 +43,7 @@
 #endif
 
 #ifdef VIENNACL_WITH_MTL4
-#include <boost/numeric/mtl/mtl.hpp>
+#include <boost/numeric/odeint/external/mtl4/mtl.hpp>
 #endif
 
 #ifdef VIENNACL_WITH_OPENCL
