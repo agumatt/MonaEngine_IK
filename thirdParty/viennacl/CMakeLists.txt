@@ -1,7 +1,7 @@
 # Project setup
 ###############
 
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.9 FATAL_ERROR)
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
@@ -38,23 +38,6 @@ ELSE()
  SET (CMAKE_BUILD_TYPE Release)
 ENDIF()
 
-# User options
-##############
-
-option(BUILD_DOXYGEN_DOCS "Build the Doxygen-generated API docs" OFF)
-
-cmake_dependent_option(ENABLE_DIST "Enable the the distribution tarball target" OFF "BUILD_DOXYGEN_DOCS" OFF)
-
-mark_as_advanced(BUILD_DOXYGEN_DOCS ENABLE_DIST)
-
-# Find prerequisites
-####################
-
-if(BUILD_DOXYGEN_DOCS)
-   find_package(Doxygen REQUIRED)
-endif()
-
-
 # Compile options
 #################
 
@@ -67,9 +50,6 @@ include_directories(BEFORE "${PROJECT_SOURCE_DIR}")
 if(BUILD_EXAMPLES)
    add_subdirectory(examples)
 endif()
-
-add_subdirectory(doc)
-
 add_subdirectory(libviennacl)
 
 # Install
