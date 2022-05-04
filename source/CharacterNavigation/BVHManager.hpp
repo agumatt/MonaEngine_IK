@@ -1,7 +1,7 @@
 #pragma once
 #ifndef BVHMANAGER_HPP
 #define BVHMANAGER_HPP
-#define VIENNACL_WITH_OPENCL 1
+#define VIENNACL_WITH_OPENCL 0
 #include "bvh_python/cython_interface.h"
 #include <string>
 #include <vector>
